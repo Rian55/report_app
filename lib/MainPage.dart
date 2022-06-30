@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'Task.dart';
+
+
 
 class MainPage extends StatefulWidget {
   final List<Task> tasks;
@@ -27,11 +28,17 @@ class _MainPage extends State<MainPage> {
 
     return menuItems;
   }
-  String selectedValue = "Tümü";
+  static String member = "";
+  static String stage = "Tümü";
+  static List<Task> cards = [];
 
 
     @override
     Widget build(BuildContext context) {
+      String selectedValue = "Tümü";
+      cards = getCards();
+
+
       return Container(
         child: Column(
             children: [
@@ -56,6 +63,8 @@ class _MainPage extends State<MainPage> {
                       const SizedBox(width: 5,),
                       getRndBtn("BG"),
                       const SizedBox(width: 5,),
+                      getRndBtn("DS"),
+                      const SizedBox(width: 5,),
                     ]
                 ),
               ),
@@ -64,7 +73,7 @@ class _MainPage extends State<MainPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(width: 13),
+                  const SizedBox(width: 13),
                   Container(
                     color: Colors.white,
                     width: 200,
@@ -79,8 +88,9 @@ class _MainPage extends State<MainPage> {
                           onChanged: (String? choice){
                             setState(() {
                               selectedValue = choice!;
+                              stage = choice;
+                              cards = getCards();
                             });
-                            getRndBtn("text");
                           },
                         ),
                       ),
@@ -88,18 +98,51 @@ class _MainPage extends State<MainPage> {
                   ),
                 ],
               ),
-              widget.tasks[0],
+              ListView(
+                shrinkWrap: true,
+                children: extractW(cards)
+              ),
             ],
         ),
       );
     }
+
+    List<Widget> extractW(List<Task> arr){
+      print(arr.length);
+      List<Widget> rtrn = [];
+      for(int i = 0; i < arr.length; i++) {
+        rtrn.add(Task(title: arr[i].title, members: arr[i].members, dueDate: arr[i].dueDate,
+        lastActivity: arr[i].lastActivity, stage: arr[i].stage,));
+      }
+      return rtrn;
+  }
 
 
 // method responsible of changing the text
 
   Widget getRndBtn(String text){
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        setState((){
+          if(text == "SR"){
+            member = "stella ryzhova";
+          }else if(text == "RR"){
+            member = "Rian Ryzhov";
+          }else if(text == "SK"){
+            member = "Sinem Kanat";
+          }else if(text == "SS"){
+            member = "Selin Selbastı";
+          }else if(text == "EK"){
+            member = "Elham kokabi";
+          }else if(text == "Y"){
+            member = "Yahya";
+          }else if(text == "BG"){
+            member = "Beyza Güller";
+          }else if(text == "DS"){
+            member = "Damla Saim";
+          }
+        });
+        },
       style: ElevatedButton.styleFrom(
         fixedSize: const Size(40, 40),
         shape: const CircleBorder(),
@@ -115,5 +158,19 @@ class _MainPage extends State<MainPage> {
     );
   }
 
-
+  List<Task> getCards(){
+      List<Task> temp = [];
+      for(int i = 0; i < widget.tasks.length; i++){
+        if(widget.tasks[i].stage == stage || stage == "Tümü") {
+          if(member != "") {
+            if (widget.tasks[i].members.contains(member)) {
+              temp.add(widget.tasks[i]);
+            }
+          }else{
+            temp.add(widget.tasks[i]);
+          }
+        }
+      }
+      return temp;
+  }
 }

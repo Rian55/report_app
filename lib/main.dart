@@ -44,7 +44,9 @@ class MyHomePage extends StatelessWidget {
           backgroundColor: Colors.transparent,
         ),
       body: const MainPage(tasks: [Task(title: "To invade Area51", lastActivity: "20.05.2022",
-        dueDate: "12.08.2022", members: ["niggachu", "niggatar", "niggachila"], stage: "Düzeltilecek",)]),
+        dueDate: "12.08.2022", members: ["stella ryzhova", "Rian Ryzhov", "Yahya"], stage: "Düzeltilecek",),
+        Task(title: "Make Obama President", lastActivity: "20.05.2018",
+          dueDate: "12.08.2014", members: ["Damla Saim", "Elham kokabi", "Yahya"], stage: "Bitti",)]),
       );
   }
 }
