@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'MainPage.dart';
+import 'Task.dart';
 
 
 void main() {
@@ -18,9 +20,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'REPORT APP',
       theme: ThemeData(
-        primarySwatch: Colors.lightBlue,
+        primarySwatch: Colors.grey,
 
       ),
       home: const MyHomePage(),
@@ -33,27 +35,16 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 8,
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: Colors.white,
         appBar: AppBar(
-          title: const Text('Görevler Listesi'),
-          bottom: const TabBar(
-            isScrollable: true,
-            tabs: [
-              Tab(text: 'Yapılması Gerekenler'),
-              Tab(text: 'Başladım'),
-              Tab(text: 'Kontrol Edilmeli'),
-              Tab(text: 'Bitti'),
-              Tab(text: 'Düzeltilecek'),
-              Tab(text: 'SABİT GÖREVLER'),
-              Tab(text: 'Her Cuma/Hafta'),
-              Tab(text: 'Her Ay'),
-            ],
-          ),
+          title: const Text('Haftalık Görev Dağılımı'),
+          elevation: 0.0,
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
         ),
-
-      ),
-    );
+      body: const MainPage(tasks: [Task(title: "To invade Area51", lastActivity: "20.05.2022",
+        dueDate: "12.08.2022", members: ["niggachu", "niggatar", "niggachila"], stage: "Düzeltilecek",)]),
+      );
   }
 }
