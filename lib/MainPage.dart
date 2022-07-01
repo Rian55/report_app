@@ -1,12 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'Task.dart';
 
-
+List<Task> allTasks = [];
 
 class MainPage extends StatefulWidget {
-  final List<Task> tasks;
+  String stage = "";
+  String member = "";
 
-  const MainPage({ Key? key, required this.tasks}): super(key: key);
+  MainPage({ Key? key}): super(key: key);
   @override
   _MainPage createState() => _MainPage();
 
@@ -28,15 +30,13 @@ class _MainPage extends State<MainPage> {
 
     return menuItems;
   }
-  static String member = "";
-  static String stage = "Tümü";
-  static List<Task> cards = [];
+
+    String selectedValue = "Tümü";
 
 
     @override
-    Widget build(BuildContext context) {
-      String selectedValue = "Tümü";
-      cards = getCards();
+    Widget build(BuildContext context) {//<-----------------------------------IT'S HERE
+      YAnT();
 
 
       return Container(
@@ -88,8 +88,6 @@ class _MainPage extends State<MainPage> {
                           onChanged: (String? choice){
                             setState(() {
                               selectedValue = choice!;
-                              stage = choice;
-                              cards = getCards();
                             });
                           },
                         ),
@@ -98,50 +96,16 @@ class _MainPage extends State<MainPage> {
                   ),
                 ],
               ),
-              ListView(
-                shrinkWrap: true,
-                children: extractW(cards)
-              ),
             ],
         ),
       );
     }
 
-    List<Widget> extractW(List<Task> arr){
-      print(arr.length);
-      List<Widget> rtrn = [];
-      for(int i = 0; i < arr.length; i++) {
-        rtrn.add(Task(title: arr[i].title, members: arr[i].members, dueDate: arr[i].dueDate,
-        lastActivity: arr[i].lastActivity, stage: arr[i].stage,));
-      }
-      return rtrn;
-  }
-
-
-// method responsible of changing the text
 
   Widget getRndBtn(String text){
     return ElevatedButton(
       onPressed: () {
-        setState((){
-          if(text == "SR"){
-            member = "stella ryzhova";
-          }else if(text == "RR"){
-            member = "Rian Ryzhov";
-          }else if(text == "SK"){
-            member = "Sinem Kanat";
-          }else if(text == "SS"){
-            member = "Selin Selbastı";
-          }else if(text == "EK"){
-            member = "Elham kokabi";
-          }else if(text == "Y"){
-            member = "Yahya";
-          }else if(text == "BG"){
-            member = "Beyza Güller";
-          }else if(text == "DS"){
-            member = "Damla Saim";
-          }
-        });
+        setState((){  });
         },
       style: ElevatedButton.styleFrom(
         fixedSize: const Size(40, 40),
@@ -158,19 +122,44 @@ class _MainPage extends State<MainPage> {
     );
   }
 
-  List<Task> getCards(){
-      List<Task> temp = [];
-      for(int i = 0; i < widget.tasks.length; i++){
-        if(widget.tasks[i].stage == stage || stage == "Tümü") {
-          if(member != "") {
-            if (widget.tasks[i].members.contains(member)) {
-              temp.add(widget.tasks[i]);
-            }
-          }else{
-            temp.add(widget.tasks[i]);
-          }
+  Future<Widget> plsNoErr(BuildContext context) async{
+
+    // Getting customer collection
+    CollectionReference _collectionRef = FirebaseFirestore.instance.collection('tasks');
+    late final Stream<QuerySnapshot> querySnapshot = _collectionRef.snapshots();
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: querySnapshot,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          print("Something went wrong.");
         }
-      }
-      return temp;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        var pendenciesList = snapshot.data!.docs;
+        print(pendenciesList);
+
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
   }
+  void YAnT() async{
+    CollectionReference _collectionRef = FirebaseFirestore.instance.collection('tasks');
+    //Map<String, dynamic> data = _collectionRef.where("capital", isEqualTo: true).get();
+  }
+  Future<void> getData() async {
+    CollectionReference _collectionRef =
+    FirebaseFirestore.instance.collection('tasks');
+    // Get docs from collection reference
+    QuerySnapshot querySnapshot = await _collectionRef.get();
+
+    // Get data from docs and convert map to List
+    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    print(allData);
+  }
+
 }
