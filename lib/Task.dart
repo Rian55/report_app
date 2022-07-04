@@ -10,6 +10,11 @@ class Task extends StatefulWidget{
   const Task ({ Key? key, required this.title, required this.members,
     required this.dueDate, required this.lastActivity, required this.stage }): super(key: key);
 
+  factory Task.fromJson(dynamic json) {
+    return Task(dueDate: json['dueDate'] as String, stage: json['Stage'] as String, title: json['Title'] as String,
+      lastActivity: json['lastActivity'] as String, members: json['Members'] as List<String>,);
+  }
+
   @override
   _Task createState() => _Task();
 
@@ -20,10 +25,12 @@ class _Task extends State<Task>{
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
+      height: 210,
       width: 310,
       child: Card(
-        shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(6.0)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(21.0)),
+        color: Colors.white,
+        elevation: 2.0,
         child:
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -31,8 +38,8 @@ class _Task extends State<Task>{
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children:[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
                       widget.title,
