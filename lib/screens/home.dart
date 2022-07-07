@@ -30,7 +30,12 @@ class _home extends State<home>{
               itemBuilder: (context, int index){
                 return ListTile(
                   title: Text(_boards[index].name),
-                  onTap: ((){}),
+                  onTap: ((){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) =>  _boards[index]),
+                    );
+                  }),
                 );
               },
               separatorBuilder: (context, index){
