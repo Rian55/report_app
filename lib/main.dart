@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'MainPage.dart';
 import 'Task.dart';
 import 'firebase_options.dart';
+import 'screens/home.dart';
 
 
 void main() async{
@@ -11,9 +11,6 @@ void main() async{
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
-
-const double windowWidth = 1200;
-const double windowHeight = 800;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -41,7 +38,7 @@ class MyHomePage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Color(0xfff0f0e2),
-      body: MainPage()
+      body: home()
     );
   }
 

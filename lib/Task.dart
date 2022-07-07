@@ -10,10 +10,6 @@ class Task extends StatefulWidget{
   const Task ({ Key? key, required this.title, required this.members,
     required this.dueDate, required this.lastActivity, required this.stage }): super(key: key);
 
-  factory Task.fromJson(dynamic json) {
-    return Task(dueDate: json['dueDate'] as String, stage: json['Stage'] as String, title: json['Title'] as String,
-      lastActivity: json['lastActivity'] as String, members: json['Members'] as List<String>,);
-  }
 
   @override
   _Task createState() => _Task();
