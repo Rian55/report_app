@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'MainPage.dart';
-import 'Task.dart';
+import 'widgets/trello_card.dart';
 import 'firebase_options.dart';
 import 'screens/home.dart';
 
@@ -28,7 +27,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-List<Task> tasksN = [];
+List<trello_card> tasksN = [];
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
 
