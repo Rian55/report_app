@@ -48,8 +48,10 @@ class _home extends State<home>{
   }
 
   Future getBoardsFromFB() async{
-    var data = await FirebaseFirestore.instance.collection('boards').get();
-    _boards = List.from(data.docs.map((doc) => trello_board.fromSnapshot(doc)));
+    if(_boards.length < 1) {
+      var data = await FirebaseFirestore.instance.collection('boards').get();
+      _boards = List.from(data.docs.map((doc) => trello_board.fromSnapshot(doc)));
+    }
   }
 
 }

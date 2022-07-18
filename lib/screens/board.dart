@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import '../widgets/trello_card.dart';
 
 class trello_board extends StatefulWidget{
-  final String name;
-  final List<dynamic> members;
-  final List<dynamic> lists;
+  String name = "";
+  List<dynamic> members = [];
+  List<dynamic> lists = [];
 
-  const trello_board ({ Key? key, required this.name, required this.members, required this.lists}): super(key: key);
+  trello_board ({ Key? key}): super(key: key);
 
   @override
   _trello_board createState() => _trello_board();
@@ -20,14 +20,39 @@ class trello_board extends StatefulWidget{
 }
 
 class _trello_board extends State<trello_board> {
+  String current_member = "";
+  String current_list = "";
   List<trello_card> _tasks = [];
+  String selectval = "All";
 
   @override
   Widget build(BuildContext context)  {
     getTasks();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.name),
+        actions: [
+          ElevatedButton(
+            ///TODO:: remove elevation after pressing button
+            onPressed: (){},
+            style: ElevatedButton.styleFrom(elevation: 0),
+            child: DropdownButtonHideUnderline (
+              child: DropdownButton(
+                elevation: 0,
+                items: get_menu(),
+                value: selectval.isNotEmpty ? selectval : null,
+                icon: Icon(Icons.sort),
+                onChanged: (value){
+                  setState(() {
+                    selectval = value.toString();
+                    current_list = value.toString();
+                  });
+                },
+              ),
+            ),
+        ),
+        ]
       ),
       body: Column(
         children: [
@@ -42,8 +67,10 @@ class _trello_board extends State<trello_board> {
                 return ElevatedButton(
                   onPressed: () {
                     setState(() {
-
-
+                      if(current_member != widget.members[index])
+                        current_member = widget.members[index];
+                      else
+                        current_member = "all";
                     });
                   },
                   style: ElevatedButton.styleFrom(
@@ -66,14 +93,21 @@ class _trello_board extends State<trello_board> {
             ),
           ),
           Expanded(
-            child: ListView.separated(
+            child: ListView.builder(
               itemCount: _tasks.length,
               shrinkWrap: true,
               itemBuilder: (context, int index){
+                if(current_member != "all" || current_list != "All") {
+                  if(current_member == "all" && _tasks[index].list == current_list)
+                    return _tasks[index];
+                  else if(current_list == "All" && _tasks[index].members.contains(current_member))
+                    return _tasks[index];
+                  else if (_tasks[index].members.contains(current_member) && _tasks[index].list == current_list)
+                    return _tasks[index];
+                  else
+                    return SizedBox();
+                }
                 return _tasks[index];
-              },
-              separatorBuilder: (context, index){
-                return Divider();
               },
             ),
           )
@@ -83,8 +117,13 @@ class _trello_board extends State<trello_board> {
   }
 
   Future getTasks() async{
-    var data = await FirebaseFirestore.instance.collection('tasks').where("Board", isEqualTo: widget.name).get();
-    _tasks = List.from(data.docs.map((doc) => trello_card.fromSnapshot(doc)));
+    if(_tasks.length < 1) {
+      var data = await FirebaseFirestore.instance
+          .collection('tasks')
+          .where("Board", isEqualTo: widget.name)
+          .get();
+      _tasks = List.from(data.docs.map((doc) => trello_card.fromSnapshot(doc)));
+    }
   }
 
   String get_initials(int index){
@@ -95,6 +134,13 @@ class _trello_board extends State<trello_board> {
     for(int i = 0; i < fullName.length; i++){
       rtrn += re.stringMatch(fullName[i]!)!;
     }
+    return rtrn;
+  }
+
+  List<DropdownMenuItem<String>> get_menu() {
+    List<DropdownMenuItem<String>> rtrn = [];
+    for(var i in widget.lists) rtrn.add(DropdownMenuItem(child: Text(i), value: i,));
+    rtrn.add(DropdownMenuItem(child: Text("All"), value: "All",));
     return rtrn;
   }
 }

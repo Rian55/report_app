@@ -61,15 +61,7 @@ class _trello_card extends State<trello_card>{
                 cardField("Members: ", membersToStr()),
                 //cardField("Last Activity: ", widget.createdDate.toString()),
                 //cardField("Due Date: ", widget.dueDate.toString()),
-                Checkbox(
-                  checkColor: Colors.black,
-                value: isChecked,
-                onChanged: (bool? value) {
-                  setState(() {
-                    isChecked = value!;
-                  });
-                },
-              ),
+
               ]
             ),
           )
