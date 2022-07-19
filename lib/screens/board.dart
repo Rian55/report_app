@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:intl/intl.dart';
 
 import '../widgets/member_list.dart';
 import '../widgets/trello_card.dart';
@@ -25,6 +27,7 @@ class _trello_board extends State<trello_board> {
   String current_list = "All";
   List<trello_card> _tasks = [];
   String selectval = "All";
+  String dialogVal = "All";
 
   @override
   void initState() {
@@ -148,23 +151,100 @@ class _trello_board extends State<trello_board> {
   }
 
   void add_card_dialog(BuildContext context){
-    showDialog(context: context, builder:(BuildContext context){
-      return AlertDialog(
-        contentPadding: const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 24.0),
-        title: const Text("Add Task"),
-        content: Container(
-          height: 320,
-          child: Column(
-            children: [
+    String title;
+    List<dynamic> members = [];
+    List<String> dueDate;
 
+    showDialog(context: context, builder:(BuildContext context){
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            contentPadding: const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 24.0),
+            title: const Text("Add Task"),
+            content: Container(
+              height: 320,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Text("Task:"),
+                      SizedBox(width:10),
+                      Container(
+                        width: 200,
+                        height: 40,
+                        child: TextField(
+                        onChanged: (text){title = text;},
+                    ),
+                      ),
+                  ]
+                  ),
+                  SizedBox(height: 15,),
+                  Row(
+                    children: [
+                      Text("Asignees:"),
+                      SizedBox(width:10),
+                      PopupMenuButton(itemBuilder: (BuildContext context){
+                        return widget.members.map((choice) {
+                          return PopupMenuItem(child: Text(choice.toString()), value: choice.toString(),);
+                        }).toList();
+                      },
+                        onSelected: (choice){
+                          if(!members.contains(choice)) {
+                              members.add(choice);
+                              setState(() {});
+                            }else{
+                            members.remove(choice);
+                          }
+                          },
+                        icon: Icon(Icons.add),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 15,),
+                  SizedBox(
+                    height: 45,
+                    child: member_list(function: null, SIZE: 20, members: members),
+                  ),
+                  SizedBox(height: 20,),
+                  BasicDateTimeField(),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("Add")),
+              TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("Close")),
             ],
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("Close"))
-        ],
+          );
+        }
       );
     }
+    );
+  }
+
+}
+class BasicDateTimeField extends StatelessWidget {
+  final format = DateFormat("yyyy-MM-dd");
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+      Text('Due Date:'),
+      DateTimeField(
+        format: format,
+        onShowPicker: (context, currentValue) async {
+          final date = await showDatePicker(
+              context: context,
+              firstDate: DateTime(1900),
+              initialDate: currentValue ?? DateTime.now(),
+              lastDate: DateTime(2100));
+
+          return currentValue;
+
+        },
+      ),
+    ],
     );
   }
 }
