@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/member_list.dart';
 import '../widgets/trello_card.dart';
 
 class trello_board extends StatefulWidget{
@@ -20,29 +21,47 @@ class trello_board extends StatefulWidget{
 }
 
 class _trello_board extends State<trello_board> {
-  String current_member = "";
-  String current_list = "";
+  String current_member = "all";
+  String current_list = "All";
   List<trello_card> _tasks = [];
   String selectval = "All";
 
   @override
-  Widget build(BuildContext context)  {
+  void initState() {
     getTasks();
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant trello_board oldWidget) {
+
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  Widget build(BuildContext context)  {
 
     return Scaffold(
+      backgroundColor: Color(0xFFDEDEDE),
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
+          backgroundColor: Color(0xFF000030),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 21),
         title: Text(widget.name),
         actions: [
           ElevatedButton(
             ///TODO:: remove elevation after pressing button
             onPressed: (){},
-            style: ElevatedButton.styleFrom(elevation: 0),
+            style: ElevatedButton.styleFrom(elevation: 0, primary: Color(0xFF000030)),
             child: DropdownButtonHideUnderline (
               child: DropdownButton(
+                dropdownColor: Color(0xFF307473),
+                style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: "Monsterrat"),
                 elevation: 0,
                 items: get_menu(),
                 value: selectval.isNotEmpty ? selectval : null,
                 icon: Icon(Icons.sort),
+                iconEnabledColor: Colors.white,
                 onChanged: (value){
                   setState(() {
                     selectval = value.toString();
@@ -57,41 +76,9 @@ class _trello_board extends State<trello_board> {
       body: Column(
         children: [
           SizedBox(
-            height: 80.0,
-            child: ListView.separated(
-              itemCount: widget.members.length,
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index){
-
-                return ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      if(current_member != widget.members[index])
-                        current_member = widget.members[index];
-                      else
-                        current_member = "all";
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    fixedSize: const Size(40, 40),
-                    shape: const CircleBorder(),
-                    primary: Color(0xFF861BFD),
-                  ),
-                  child: Text(
-                    get_initials(index),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      color: Colors.white,
-                    ),
-                  ),
-                );
-              },
-              separatorBuilder: (context, index){
-                return const SizedBox(width: 5,);
-              },
+            height: 85.0,
+            child:  member_list(members: widget.members, function: set_current_member, SIZE: 40,)
             ),
-          ),
           Expanded(
             child: ListView.builder(
               itemCount: _tasks.length,
@@ -112,6 +99,11 @@ class _trello_board extends State<trello_board> {
             ),
           )
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){add_card_dialog(context);},
+        backgroundColor: Color(0xFF000030),
+        child: const Icon(Icons.add, color: Colors.white,),
       ),
     );
   }
@@ -139,8 +131,40 @@ class _trello_board extends State<trello_board> {
 
   List<DropdownMenuItem<String>> get_menu() {
     List<DropdownMenuItem<String>> rtrn = [];
-    for(var i in widget.lists) rtrn.add(DropdownMenuItem(child: Text(i), value: i,));
-    rtrn.add(DropdownMenuItem(child: Text("All"), value: "All",));
+    rtrn.add(const DropdownMenuItem(value: "All",child: Text("All"),));
+    for(var i in widget.lists) {
+      rtrn.add(DropdownMenuItem(value: i,child: Text(i),));
+    }
     return rtrn;
+  }
+
+  void set_current_member(String member_name){
+    setState((){
+      if(current_member != member_name)
+        current_member = member_name;
+      else
+        current_member = "all";
+    });
+  }
+
+  void add_card_dialog(BuildContext context){
+    showDialog(context: context, builder:(BuildContext context){
+      return AlertDialog(
+        contentPadding: const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 24.0),
+        title: const Text("Add Task"),
+        content: Container(
+          height: 320,
+          child: Column(
+            children: [
+
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("Close"))
+        ],
+      );
+    }
+    );
   }
 }

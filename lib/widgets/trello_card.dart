@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:report_app/widgets/member_list.dart';
 
 class trello_card extends StatefulWidget{
   String board = "";
@@ -28,72 +29,127 @@ class trello_card extends StatefulWidget{
 }
 
 class _trello_card extends State<trello_card>{
+  double _height = 180;
+
+  @override
+  void initState() {
+    //_set_heigth();
+  }
 
   @override
   Widget build(BuildContext context) {
-    bool isChecked = false;
-    return Container(
-      height: 210,
-      width: 310,
+    return SizedBox(
+      height: _height,
+      width: 400,
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(21.0)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         color: Colors.white,
         elevation: 2.0,
-        child:
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children:[
-                Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.title,
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
+                    Container(
+                      alignment: Alignment.center,
+                      height: 40,
+                      width: 130,
+                      decoration: const BoxDecoration(
+                          color: Color(0xFF307473),
+                          borderRadius: BorderRadius.all(Radius.circular(20))
+                      ),
+                      child: Text(widget.list, style: const TextStyle(color: Colors.white,
+                          fontSize: 13, fontFamily: "Monsterrat"),),
                     ),
+                    SizedBox(height: _height-110,),
+                    Row(
+                      children: [Container(
+                        alignment: Alignment.bottomLeft,
+                        height: 40,
+                        width: 160,
+                        child: member_list(function: null, SIZE: 20, members: widget.members),
+                      ),
+                      ]
+                    )
+                    //
+                  ]
+                ),
+              const SizedBox(width: 18),
+              Flexible(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 60,
+                      child: SingleChildScrollView(
+                        child: Text(
+                          widget.title,
+                          style: const TextStyle(fontSize: 15, color: Color(0xFF000025), fontFamily: "Monsterrat"),
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 47),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          onPressed: (){showAlertDialog(context);},
+                          icon: Icon(Icons.delete, color: Color(0xFFDEDEDE),),
+                      ),
+                    ]
+                    )
                   ],
                 ),
-                const SizedBox(height: 6,),
-                cardField("Stage: ", widget.list),
-                cardField("Members: ", membersToStr()),
-                //cardField("Last Activity: ", widget.createdDate.toString()),
-                //cardField("Due Date: ", widget.dueDate.toString()),
+              ),
+              const SizedBox(width: 30),
 
-              ]
-            ),
+            ]
           )
-      ),
+        )
+      )
     );
   }
-  String membersToStr(){
-    String rtrn = "";
-    for(int i = 0; i < widget.members.length; i++) {
-      rtrn += widget.members[i];
-      if(i != widget.members.length-1) {
-        rtrn += ", ";
-      }
+
+  showAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: const Text("Cancel"),
+      onPressed:  () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = TextButton(
+      child: const Text("Delete"),
+      onPressed:  () {
+        Navigator.of(context).pop();
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text("Delete Card"),
+      content: const Text("By pressing Delete you agree to remove this card to archieve"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  /*void _set_heigth(){
+    if (widget.title.length > 33){
+      _height +=  ((widget.title.length - 33)/11)*8;
     }
-    return rtrn;
-  }
-
-  Widget cardField(String bldPart, String filler){
-    return RichText(
-      text: TextSpan(
-        // Note: Styles for TextSpans must be explicitly defined.
-        // Child text spans will inherit styles from parent
-        style: const TextStyle(
-          fontSize: 18.0,
-          color: Colors.black,
-        ),
-        children: <TextSpan>[
-          TextSpan(text: bldPart, style: const TextStyle(fontWeight: FontWeight.bold)),
-          TextSpan(text: filler),
-        ],
-      ),
-    );
-  }
-
+  }*/
 }

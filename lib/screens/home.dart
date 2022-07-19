@@ -11,15 +11,22 @@ class home extends StatefulWidget{
 
 class _home extends State<home>{
   List<trello_board> _boards = [];
+  @override
+  void initState() {
+    getBoardsFromFB();
+    super.initState();
+  }
 
 
   @override
   Widget build(BuildContext context) {
-    getBoardsFromFB();
 
     return Scaffold(
+      backgroundColor: Color(0xFFDEDEDE),
       appBar: AppBar(
+        backgroundColor: Color(0xFF000030),
         title: const Text("EWP Organization"),
+        titleTextStyle: TextStyle(color: Colors.white, fontSize: 21),
       ),
       body: Column(
         children: [
