@@ -6,7 +6,7 @@ class trello_card extends StatefulWidget{
   String board = "";
   String title = "";
   List<dynamic> members = [];
-  String dueDate = "";
+  String? dueDate;
   Timestamp? createdDate;
   String list = "";
   String id = "";
@@ -26,6 +26,7 @@ class trello_card extends StatefulWidget{
     createdDate = snapshot['createdDate'];
     list = snapshot['List'];
     board = snapshot['Board'];
+    //removed = snapshot['Removed'];
     id = snapshot.id;
   }
 
@@ -46,88 +47,70 @@ class trello_card extends StatefulWidget{
 }
 
 class _trello_card extends State<trello_card>{
-  double _height = 180;
-
-  @override
-  void initState() {
-    //_set_heigth();
-  }
+  double _height = 190;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: _height,
-      width: 400,
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-        color: Colors.white,
-        elevation: 2.0,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      alignment: Alignment.center,
-                      height: 40,
-                      width: 142,
-                      decoration: const BoxDecoration(
-                          color: Color(0xFF307473),
-                          borderRadius: BorderRadius.all(Radius.circular(20))
-                      ),
-                      child: Text(widget.list, style: const TextStyle(color: Colors.white,
-                          fontSize: 13, fontFamily: "Monsterrat"),),
-                    ),
-                    SizedBox(height: _height-110,),
-                    Row(
-                      children: [Container(
-                        alignment: Alignment.bottomLeft,
-                        height: 40,
-                        width: 160,
-                        child: member_list(function: null, SIZE: 20, members: widget.members),
-                      ),
-                      ]
-                    )
-                    //
-                  ]
+      child: GestureDetector(
+        onTap: (){
+          showCard(context);
+        },
+        child: Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+          color: Colors.white,
+          elevation: 2.0,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  alignment: Alignment.center,
+                  height: 40,
+                  width: 160,
+                  decoration: const BoxDecoration(
+                      color: Color(0xFF307473),
+                      borderRadius: BorderRadius.all(Radius.circular(20))
+                  ),
+                  child: Text(widget.list, style: const TextStyle(color: Colors.white,
+                      fontSize: 13, fontFamily: "Monsterrat"),),
                 ),
-              const SizedBox(width: 18),
-              Flexible(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 60,
-                      child: SingleChildScrollView(
-                        child: Text(
-                          widget.title,
-                          style: const TextStyle(fontSize: 15, color: Color(0xFF000025), fontFamily: "Monsterrat"),
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
+
+                const SizedBox(height: 18),
+
+                SizedBox(
+                  height: 38,
+                  child: SingleChildScrollView(
+                    child: Text(
+                      getTitle(),
+                      style: const TextStyle(fontSize: 15, color: Color(0xFF000025), fontFamily: "Monsterrat"),
+                      textAlign: TextAlign.start,
                     ),
-                    SizedBox(height: 47),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          onPressed: (){showAlertDialog(context);},
-                          icon: Icon(Icons.delete, color: Color(0xFFDEDEDE),),
+                  ),
+                ),
+                SizedBox(height: 20,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 40,
+                        width: MediaQuery.of(context).size.width-76,
+                        child: member_list(function: null, SIZE: 20, members: widget.members),
+                    ),
+                      IconButton(
+                        onPressed: (){showAlertDialog(context);},
+                        icon: Icon(Icons.delete, color: Color(0xFFDEDEDE),),
                       ),
                     ]
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(width: 30),
+                )
 
-            ]
+              ]
+            )
           )
-        )
+        ),
       )
     );
   }
@@ -167,9 +150,72 @@ class _trello_card extends State<trello_card>{
     );
   }
 
-  /*void _set_heigth(){
-    if (widget.title.length > 33){
-      _height +=  ((widget.title.length - 33)/11)*8;
+  showCard(BuildContext context){
+    Widget closeButton = TextButton(
+      child: const Text("Close"),
+      onPressed:  () {
+        Navigator.of(context).pop();
+      },
+    );
+
+    AlertDialog card = AlertDialog(
+      title: Text(widget.title),
+      content: SizedBox(
+        height: 280,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              height: 40,
+              width: 160,
+              decoration: const BoxDecoration(
+                  color: Color(0xFF307473),
+                  borderRadius: BorderRadius.all(Radius.circular(20))
+              ),
+              child: Text(widget.list, style: const TextStyle(color: Colors.white,
+                  fontSize: 13, fontFamily: "Monsterrat"),),
+            ),
+            SizedBox(height: 10,),
+            Text("Members:  "),
+            SizedBox(height: 10,),
+            SizedBox(
+                height: 40,
+                width: MediaQuery.of(context).size.width-76,
+                child: member_list(function: null, members: widget.members, SIZE: 20)
+            ),
+            SizedBox(height: 10,),
+            //Text("Due Date: ${widget.dueDate}"),
+            SizedBox(height: 10,),
+            Text("Created Date: ${widget.createdDate!.toDate().day}/"
+                "${widget.createdDate!.toDate().month}/${widget.createdDate!.toDate().year}"),
+          ],
+        ),
+      ),
+      actions: [
+        closeButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return card;
+      },
+    );
+  }
+
+  String getTitle(){
+    List<String> words = widget.title.split(" ");
+    String rtrn = words[0];
+    for(int i = 1; i < 9; i++){
+      if(i >= words.length)
+        break;
+      rtrn += " ${words[i]}";
     }
-  }*/
+    if(words.length > 9)
+      rtrn += "...";
+    return rtrn;
+  }
 }
