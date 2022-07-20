@@ -59,39 +59,17 @@ class _trello_board extends State<trello_board> {
               current_list = choice.toString();
               setState(() {});
             },
-            color: Color(0xFF307473),
+            color: const Color(0xFF307473),
             icon: const Icon(Icons.sort, color: Colors.white),
           ),
-          /*ElevatedButton(
-            ///TODO:: remove elevation after pressing button
-            onPressed: (){},
-            style: ElevatedButton.styleFrom(elevation: 0, primary: const Color(0xFF000030)),
-            child: DropdownButtonHideUnderline (
-              child: DropdownButton(
-                dropdownColor: const Color(0xFF307473),
-                style: const TextStyle(color: Colors.white, fontSize: 14, fontFamily: "Monsterrat"),
-                elevation: 0,
-                items: get_menu(),
-                value: selectval.isNotEmpty ? selectval : null,
-                icon: const Icon(Icons.sort),
-                iconEnabledColor: Colors.white,
-                onChanged: (value){
-                  setState(() {
-                    selectval = value.toString();
-                    current_list = value.toString();
-                  });
-                },
-              ),
-            ),
-        ),*/
         ]
       ),
       body: Column(
         children: [
-          SizedBox(
-            height: 85.0,
-            child:  member_list(members: widget.members, function: set_current_member, SIZE: 40,)
-            ),
+           SizedBox(
+              height: 85.0,
+              child:  member_list(members: widget.members, function: set_current_member, SIZE: 40,),
+           ),
           Expanded(
             child: ListView.builder(
               itemCount: _tasks.length,
@@ -158,9 +136,9 @@ class _trello_board extends State<trello_board> {
 
   List<PopupMenuItem<String>> get_menu() {
     List<PopupMenuItem<String>> rtrn = [];
-    rtrn.add(const PopupMenuItem(value: "All",child: Text("All"),));
+    rtrn.add(const PopupMenuItem(value: "All",child: Text("All", style: TextStyle(color: Colors.white),),));
     for(var i in widget.lists) {
-      rtrn.add(PopupMenuItem(value: i,child: Text(i),));
+      rtrn.add(PopupMenuItem(value: i,child: Text(i, style: const TextStyle(color: Colors.white),),));
     }
     return rtrn;
   }
@@ -215,7 +193,7 @@ class _trello_board extends State<trello_board> {
                         const SizedBox(width:10),
                         Container(
                           height: 40,
-                          decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xFF307473)),
+                          decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF307473)),
                           child: PopupMenuButton(itemBuilder: (BuildContext context){
                             return widget.members.map((choice) {
                               return PopupMenuItem(value: choice.toString(),child: Text(choice.toString()),);
@@ -252,7 +230,7 @@ class _trello_board extends State<trello_board> {
                         const SizedBox(width:10),
                         Container(
                           height: 40,
-                          decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xFF307473)),
+                          decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF307473)),
                           child: IconButton(
                             onPressed: () async{
                               DateTime? currentValue;
@@ -271,7 +249,7 @@ class _trello_board extends State<trello_board> {
                                       ),
                                       textButtonTheme: TextButtonThemeData(
                                         style: TextButton.styleFrom(
-                                          primary: Color(0xFF000030), // button text color
+                                          primary: const Color(0xFF000030), // button text color
                                         ),
                                       ),
                                     ),
@@ -282,7 +260,7 @@ class _trello_board extends State<trello_board> {
                               dueDate = currentValue!;
                               setState((){});
                             },
-                            icon: Icon(Icons.calendar_month_outlined, color: Colors.white,)
+                            icon: const Icon(Icons.calendar_month_outlined, color: Colors.white,)
                           ),
                         ),
                       ],

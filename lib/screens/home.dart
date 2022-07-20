@@ -31,7 +31,6 @@ class _home extends State<home>{
       ),
       body: Column(
         children: [
-          //Text("but this works wtf"),
           ListView.separated(
               itemCount: _boards.length,
               shrinkWrap: true,
@@ -49,6 +48,11 @@ class _home extends State<home>{
               separatorBuilder: (context, index){
                 return const Divider();
               },
+          ),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8.0, 300.0,8.0,10.0),
+            child: Image.asset('Assets/Logo/Logopng.png'),
           )
         ],
       ),
