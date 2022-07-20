@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
 
 import '../widgets/member_list.dart';
@@ -52,7 +51,18 @@ class _trello_board extends State<trello_board> {
           titleTextStyle: const TextStyle(color: Colors.white, fontSize: 21),
         title: Text(widget.name),
         actions: [
-          ElevatedButton(
+          PopupMenuButton(
+            itemBuilder: (BuildContext context){
+              return get_menu();
+          },
+            onSelected: (choice){
+              current_list = choice.toString();
+              setState(() {});
+            },
+            color: Color(0xFF307473),
+            icon: const Icon(Icons.sort, color: Colors.white),
+          ),
+          /*ElevatedButton(
             ///TODO:: remove elevation after pressing button
             onPressed: (){},
             style: ElevatedButton.styleFrom(elevation: 0, primary: const Color(0xFF000030)),
@@ -73,7 +83,7 @@ class _trello_board extends State<trello_board> {
                 },
               ),
             ),
-        ),
+        ),*/
         ]
       ),
       body: Column(
@@ -87,6 +97,9 @@ class _trello_board extends State<trello_board> {
               itemCount: _tasks.length,
               shrinkWrap: true,
               itemBuilder: (context, int index){
+                if(_tasks[index].removed) {
+                  return const SizedBox();
+                }
                 if(current_member != "all" || current_list != "All") {
                   if(current_member == "all" && _tasks[index].list == current_list) {
                     return _tasks[index];
@@ -112,13 +125,22 @@ class _trello_board extends State<trello_board> {
     );
   }
 
+  void refresh(){
+    setState(() {
+    });
+  }
+
   Future getTasks() async{
     if(_tasks.isEmpty) {
       var data = await FirebaseFirestore.instance
           .collection('tasks')
           .where("Board", isEqualTo: widget.name)
           .get();
-      _tasks = List.from(data.docs.map((doc) => trello_card.fromSnapshot(doc)));
+      _tasks = List.from(data.docs.map((doc){
+        trello_card newCard = trello_card.fromSnapshot(doc);
+        newCard.setRefreshBoard(refresh);
+        return newCard;
+      }));
     }
     setState((){});
   }
@@ -134,11 +156,11 @@ class _trello_board extends State<trello_board> {
     return rtrn;
   }
 
-  List<DropdownMenuItem<String>> get_menu() {
-    List<DropdownMenuItem<String>> rtrn = [];
-    rtrn.add(const DropdownMenuItem(value: "All",child: Text("All"),));
+  List<PopupMenuItem<String>> get_menu() {
+    List<PopupMenuItem<String>> rtrn = [];
+    rtrn.add(const PopupMenuItem(value: "All",child: Text("All"),));
     for(var i in widget.lists) {
-      rtrn.add(DropdownMenuItem(value: i,child: Text(i),));
+      rtrn.add(PopupMenuItem(value: i,child: Text(i),));
     }
     return rtrn;
   }
@@ -154,9 +176,10 @@ class _trello_board extends State<trello_board> {
   }
 
   void add_card_dialog(BuildContext context){
-    String title;
+    String title = "";
     List<dynamic> members = [];
-    List<String> dueDate;
+    DateTime dueDate = DateTime.now();
+    final format = DateFormat("yyyy-MM-dd");
 
     showDialog(context: context, builder:(BuildContext context){
       return StatefulBuilder(
@@ -164,58 +187,129 @@ class _trello_board extends State<trello_board> {
           return AlertDialog(
             contentPadding: const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 24.0),
             title: const Text("Add Task"),
-            content: SizedBox(
-              height: 320,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Text("Task:"),
-                      const SizedBox(width:10),
-                      SizedBox(
-                        width: 200,
-                        height: 40,
-                        child: TextField(
-                        onChanged: (text){title = text;},
+            content: SingleChildScrollView(
+              child: SizedBox(
+                height: 280,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Text("Task:"),
+                        const SizedBox(width:10),
+                        SizedBox(
+                          width: 200,
+                          height: 40,
+                          child: TextField(
+                            onChanged: (text){title = text;},
+
+                          ),
+                        ),
+                    ]
                     ),
-                      ),
-                  ]
-                  ),
-                  const SizedBox(height: 15,),
-                  Row(
-                    children: [
-                      const Text("Asignees:"),
-                      const SizedBox(width:10),
-                      PopupMenuButton(itemBuilder: (BuildContext context){
-                        return widget.members.map((choice) {
-                          return PopupMenuItem(value: choice.toString(),child: Text(choice.toString()),);
-                        }).toList();
-                      },
-                        onSelected: (choice){
-                          if(!members.contains(choice)) {
-                              members.add(choice);
-                              setState(() {});
-                            }else{
-                            members.remove(choice);
-                          }
+
+                    const SizedBox(height: 15,),
+
+                    Row(
+                      children: [
+                        const Text("Asignees:"),
+                        const SizedBox(width:10),
+                        Container(
+                          height: 40,
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xFF307473)),
+                          child: PopupMenuButton(itemBuilder: (BuildContext context){
+                            return widget.members.map((choice) {
+                              return PopupMenuItem(value: choice.toString(),child: Text(choice.toString()),);
+                            }).toList();
                           },
-                        icon: const Icon(Icons.add),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 15,),
-                  SizedBox(
-                    height: 45,
-                    child: member_list(function: null, SIZE: 20, members: members),
-                  ),
-                  const SizedBox(height: 20,),
-                  BasicDateTimeField(),
-                ],
+                            onSelected: (choice){
+                              if(!members.contains(choice)) {
+                                  members.add(choice);
+                              }else{
+                                members.remove(choice);
+                              }
+                              setState(() {});
+                              },
+                            icon: const Icon(Icons.add, color: Colors.white,),
+                          ),
+                        )
+                      ],
+                    ),
+
+                    const SizedBox(height: 15,),
+
+                    SizedBox(
+                      height: 45,
+                      child: member_list(function: null, SIZE: 20, members: members),
+                    ),
+
+                    const SizedBox(height: 20,),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        const Text('Due Date:   '),
+                        Text("${dueDate.day}/${dueDate.month}/${dueDate.year}"),
+                        const SizedBox(width:10),
+                        Container(
+                          height: 40,
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xFF307473)),
+                          child: IconButton(
+                            onPressed: () async{
+                              DateTime? currentValue;
+                              currentValue = await showDatePicker(
+                                  context: context,
+                                  firstDate: DateTime(1900),
+                                  initialDate: currentValue ?? DateTime.now(),
+                                  lastDate: DateTime(2100),
+                                builder: (context, child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: const ColorScheme.light(
+                                        primary: Color(0xFF000030), // <-- SEE HERE
+                                        onPrimary: Colors.white, // <-- SEE HERE
+                                        onSurface: Colors.black, // <-- SEE HERE
+                                      ),
+                                      textButtonTheme: TextButtonThemeData(
+                                        style: TextButton.styleFrom(
+                                          primary: Color(0xFF000030), // button text color
+                                        ),
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
+                              );
+                              dueDate = currentValue!;
+                              setState((){});
+                            },
+                            icon: Icon(Icons.calendar_month_outlined, color: Colors.white,)
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
             actions: <Widget>[
-              TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("Add")),
-              TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("Close")),
+              TextButton(onPressed: (){
+                if(title != "") {
+                  trello_card newTask = trello_card();
+                  newTask.dueDate = dueDate.toString();
+                  newTask.title = title;
+                  newTask.members = members;
+                  newTask.list = "Yapılması Gerekenler";
+                  newTask.createdDate = Timestamp.fromDate(DateTime.now());
+                  newTask.board = widget.name;
+                  _tasks.add(newTask);
+                  refresh();
+                  Navigator.of(context).pop();
+                } else{
+                }
+                },
+                  child: const Text("Add", style: TextStyle(color: Color(0xFF000030)),)),
+              TextButton(onPressed: (){Navigator.of(context).pop();},
+                  child: const Text("Close", style: TextStyle(color: Color(0xFF000030)),)),
             ],
           );
         }
@@ -224,31 +318,4 @@ class _trello_board extends State<trello_board> {
     );
   }
 
-}
-class BasicDateTimeField extends StatelessWidget {
-  final format = DateFormat("yyyy-MM-dd");
-
-  BasicDateTimeField({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-      const Text('Due Date:'),
-      DateTimeField(
-        format: format,
-        onShowPicker: (context, currentValue) async {
-          final date = await showDatePicker(
-              context: context,
-              firstDate: DateTime(1900),
-              initialDate: currentValue ?? DateTime.now(),
-              lastDate: DateTime(2100)
-          );
-          return currentValue;
-        },
-      ),
-    ],
-    );
-  }
 }

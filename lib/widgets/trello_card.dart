@@ -10,6 +10,8 @@ class trello_card extends StatefulWidget{
   Timestamp? createdDate;
   String list = "";
   String id = "";
+  bool removed = false;
+  Function()? _refreshBoard;
 
   trello_card ({ Key? key}): super(key: key);
 
@@ -25,6 +27,10 @@ class trello_card extends StatefulWidget{
     list = snapshot['List'];
     board = snapshot['Board'];
     id = snapshot.id;
+  }
+
+  void setRefreshBoard(Function() refresh) {
+    _refreshBoard = refresh;
   }
 }
 
@@ -55,7 +61,7 @@ class _trello_card extends State<trello_card>{
                     Container(
                       alignment: Alignment.center,
                       height: 40,
-                      width: 130,
+                      width: 142,
                       decoration: const BoxDecoration(
                           color: Color(0xFF307473),
                           borderRadius: BorderRadius.all(Radius.circular(20))
@@ -123,9 +129,11 @@ class _trello_card extends State<trello_card>{
         Navigator.of(context).pop();
       },
     );
-    Widget continueButton = TextButton(
-      child: const Text("Delete"),
+    Widget deleteButton = TextButton(
+      child: const Text("Delete", style: TextStyle(color: Colors.red),),
       onPressed:  () {
+        widget.removed = true;
+        widget._refreshBoard;
         Navigator.of(context).pop();
       },
     );
@@ -134,8 +142,8 @@ class _trello_card extends State<trello_card>{
       title: const Text("Delete Card"),
       content: const Text("By pressing Delete you agree to remove this card to archieve"),
       actions: [
+        deleteButton,
         cancelButton,
-        continueButton,
       ],
     );
     // show the dialog
