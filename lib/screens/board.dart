@@ -276,12 +276,14 @@ class _trello_board extends State<trello_board> {
                   newTask.dueDate = dueDate.toString();
                   newTask.title = title;
                   newTask.members = members;
-                  newTask.list = "Yapılması Gerekenler";
+                  newTask.list = widget.lists[0];
                   newTask.createdDate = Timestamp.fromDate(DateTime.now());
                   newTask.board = widget.name;
+                  newTask.setRefreshBoard(refresh);
                   _tasks.add(newTask);
                   refresh();
                   Navigator.of(context).pop();
+                  FirebaseFirestore.instance.collection('tasks').add(newTask.toJson());
                 } else{
                 }
                 },

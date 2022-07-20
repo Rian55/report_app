@@ -29,6 +29,17 @@ class trello_card extends StatefulWidget{
     id = snapshot.id;
   }
 
+  Map<String, dynamic> toJson() =>
+      {
+        'Board': board,
+        'Title': title,
+        'Members': members,
+        'dueDate': dueDate,
+        'createdDate': createdDate,
+        'List': list,
+        'Removed': removed,
+      };
+
   void setRefreshBoard(Function() refresh) {
     _refreshBoard = refresh;
   }
@@ -133,8 +144,9 @@ class _trello_card extends State<trello_card>{
       child: const Text("Delete", style: TextStyle(color: Colors.red),),
       onPressed:  () {
         widget.removed = true;
-        widget._refreshBoard;
+        widget._refreshBoard!();
         Navigator.of(context).pop();
+        FirebaseFirestore.instance.collection('tasks').doc(widget.id).update({'Removed': widget.removed});
       },
     );
     // set up the AlertDialog
