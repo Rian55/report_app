@@ -36,7 +36,7 @@ class MyHomePage extends StatelessWidget {
     //loadTasks();
 
     return Scaffold(
-      backgroundColor: Color(0xfff0f0e2),
+      backgroundColor: const Color(0xfff0f0e2),
       body: home()
     );
   }

@@ -6,6 +6,7 @@ class home extends StatefulWidget{
 
   home ({ Key? key}): super(key: key);
 
+  @override
   _home createState() => _home();
 }
 
@@ -22,11 +23,11 @@ class _home extends State<home>{
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: Color(0xFFDEDEDE),
+      backgroundColor: const Color(0xFFDEDEDE),
       appBar: AppBar(
-        backgroundColor: Color(0xFF000030),
+        backgroundColor: const Color(0xFF000030),
         title: const Text("EWP Organization"),
-        titleTextStyle: TextStyle(color: Colors.white, fontSize: 21),
+        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 21),
       ),
       body: Column(
         children: [
@@ -46,7 +47,7 @@ class _home extends State<home>{
                 );
               },
               separatorBuilder: (context, index){
-                return Divider();
+                return const Divider();
               },
           )
         ],
@@ -55,10 +56,11 @@ class _home extends State<home>{
   }
 
   Future getBoardsFromFB() async{
-    if(_boards.length < 1) {
+    if(_boards.isEmpty) {
       var data = await FirebaseFirestore.instance.collection('boards').get();
       _boards = List.from(data.docs.map((doc) => trello_board.fromSnapshot(doc)));
     }
+    setState(() {});
   }
 
 }

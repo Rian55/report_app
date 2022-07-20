@@ -16,20 +16,21 @@ class _member_list extends State<member_list>{
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      physics: BouncingScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       itemCount: widget.members.length,
       shrinkWrap: true,
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, index){
         return ElevatedButton(
           onPressed: () {
-            if(widget.function != null)
+            if(widget.function != null) {
               widget.function!(widget.members[index]);
+            }
           },
           style: ElevatedButton.styleFrom(
             fixedSize: Size(widget.SIZE, widget.SIZE),
             shape: const CircleBorder(),
-            primary: Color(0xFF519872),
+            primary: const Color(0xFF519872),
           ),
           child: Text(
             get_initials(widget.members[index]),

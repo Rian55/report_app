@@ -16,10 +16,10 @@ class trello_board extends StatefulWidget{
   @override
   _trello_board createState() => _trello_board();
 
-  trello_board.fromSnapshot(snapshot)
+  trello_board.fromSnapshot(snapshot, {Key? key})
     :lists = snapshot.data()['Lists'],
     members = snapshot.data()['Members'],
-    name = snapshot.data()['Name'];
+    name = snapshot.data()['Name'], super(key: key);
 }
 
 class _trello_board extends State<trello_board> {
@@ -45,25 +45,25 @@ class _trello_board extends State<trello_board> {
   Widget build(BuildContext context)  {
 
     return Scaffold(
-      backgroundColor: Color(0xFFDEDEDE),
+      backgroundColor: const Color(0xFFDEDEDE),
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-          backgroundColor: Color(0xFF000030),
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 21),
+        iconTheme: const IconThemeData(color: Colors.white),
+          backgroundColor: const Color(0xFF000030),
+          titleTextStyle: const TextStyle(color: Colors.white, fontSize: 21),
         title: Text(widget.name),
         actions: [
           ElevatedButton(
             ///TODO:: remove elevation after pressing button
             onPressed: (){},
-            style: ElevatedButton.styleFrom(elevation: 0, primary: Color(0xFF000030)),
+            style: ElevatedButton.styleFrom(elevation: 0, primary: const Color(0xFF000030)),
             child: DropdownButtonHideUnderline (
               child: DropdownButton(
-                dropdownColor: Color(0xFF307473),
-                style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: "Monsterrat"),
+                dropdownColor: const Color(0xFF307473),
+                style: const TextStyle(color: Colors.white, fontSize: 14, fontFamily: "Monsterrat"),
                 elevation: 0,
                 items: get_menu(),
                 value: selectval.isNotEmpty ? selectval : null,
-                icon: Icon(Icons.sort),
+                icon: const Icon(Icons.sort),
                 iconEnabledColor: Colors.white,
                 onChanged: (value){
                   setState(() {
@@ -88,14 +88,15 @@ class _trello_board extends State<trello_board> {
               shrinkWrap: true,
               itemBuilder: (context, int index){
                 if(current_member != "all" || current_list != "All") {
-                  if(current_member == "all" && _tasks[index].list == current_list)
+                  if(current_member == "all" && _tasks[index].list == current_list) {
                     return _tasks[index];
-                  else if(current_list == "All" && _tasks[index].members.contains(current_member))
+                  } else if(current_list == "All" && _tasks[index].members.contains(current_member)) {
                     return _tasks[index];
-                  else if (_tasks[index].members.contains(current_member) && _tasks[index].list == current_list)
+                  } else if (_tasks[index].members.contains(current_member) && _tasks[index].list == current_list) {
                     return _tasks[index];
-                  else
-                    return SizedBox();
+                  } else {
+                    return const SizedBox();
+                  }
                 }
                 return _tasks[index];
               },
@@ -105,20 +106,21 @@ class _trello_board extends State<trello_board> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){add_card_dialog(context);},
-        backgroundColor: Color(0xFF000030),
+        backgroundColor: const Color(0xFF000030),
         child: const Icon(Icons.add, color: Colors.white,),
       ),
     );
   }
 
   Future getTasks() async{
-    if(_tasks.length < 1) {
+    if(_tasks.isEmpty) {
       var data = await FirebaseFirestore.instance
           .collection('tasks')
           .where("Board", isEqualTo: widget.name)
           .get();
       _tasks = List.from(data.docs.map((doc) => trello_card.fromSnapshot(doc)));
     }
+    setState((){});
   }
 
   String get_initials(int index){
@@ -141,12 +143,13 @@ class _trello_board extends State<trello_board> {
     return rtrn;
   }
 
-  void set_current_member(String member_name){
+  void set_current_member(String memberName){
     setState((){
-      if(current_member != member_name)
-        current_member = member_name;
-      else
+      if(current_member != memberName) {
+        current_member = memberName;
+      } else {
         current_member = "all";
+      }
     });
   }
 
@@ -161,15 +164,15 @@ class _trello_board extends State<trello_board> {
           return AlertDialog(
             contentPadding: const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 24.0),
             title: const Text("Add Task"),
-            content: Container(
+            content: SizedBox(
               height: 320,
               child: Column(
                 children: [
                   Row(
                     children: [
-                      Text("Task:"),
-                      SizedBox(width:10),
-                      Container(
+                      const Text("Task:"),
+                      const SizedBox(width:10),
+                      SizedBox(
                         width: 200,
                         height: 40,
                         child: TextField(
@@ -178,14 +181,14 @@ class _trello_board extends State<trello_board> {
                       ),
                   ]
                   ),
-                  SizedBox(height: 15,),
+                  const SizedBox(height: 15,),
                   Row(
                     children: [
-                      Text("Asignees:"),
-                      SizedBox(width:10),
+                      const Text("Asignees:"),
+                      const SizedBox(width:10),
                       PopupMenuButton(itemBuilder: (BuildContext context){
                         return widget.members.map((choice) {
-                          return PopupMenuItem(child: Text(choice.toString()), value: choice.toString(),);
+                          return PopupMenuItem(value: choice.toString(),child: Text(choice.toString()),);
                         }).toList();
                       },
                         onSelected: (choice){
@@ -196,16 +199,16 @@ class _trello_board extends State<trello_board> {
                             members.remove(choice);
                           }
                           },
-                        icon: Icon(Icons.add),
+                        icon: const Icon(Icons.add),
                       )
                     ],
                   ),
-                  SizedBox(height: 15,),
+                  const SizedBox(height: 15,),
                   SizedBox(
                     height: 45,
                     child: member_list(function: null, SIZE: 20, members: members),
                   ),
-                  SizedBox(height: 20,),
+                  const SizedBox(height: 20,),
                   BasicDateTimeField(),
                 ],
               ),
@@ -225,12 +228,14 @@ class _trello_board extends State<trello_board> {
 class BasicDateTimeField extends StatelessWidget {
   final format = DateFormat("yyyy-MM-dd");
 
+  BasicDateTimeField({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-      Text('Due Date:'),
+      const Text('Due Date:'),
       DateTimeField(
         format: format,
         onShowPicker: (context, currentValue) async {
@@ -238,10 +243,9 @@ class BasicDateTimeField extends StatelessWidget {
               context: context,
               firstDate: DateTime(1900),
               initialDate: currentValue ?? DateTime.now(),
-              lastDate: DateTime(2100));
-
+              lastDate: DateTime(2100)
+          );
           return currentValue;
-
         },
       ),
     ],
